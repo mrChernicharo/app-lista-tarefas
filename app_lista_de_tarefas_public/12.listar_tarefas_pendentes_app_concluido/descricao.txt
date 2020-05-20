@@ -1,0 +1,4 @@
+Simbora desengessar a index.php, que até agora só está exibindo tarefas hard-code
+
+Repare que a lógica da página é praticamente a mesma de todas_tarefas, aqui também podemos atualizar ou
+excluir tarefas
