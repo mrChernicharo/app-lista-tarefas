@@ -1,0 +1,22 @@
+1. vamos criar o script 'tarefa.service.php' fora de htdocs
+
+a ideia é criar a classe TarefaService que será responsável pelas nossas operações de CRUD
+isto é, os métodos para a criar, recuperar(ler), atualizar e deletar registros no banco de dados
+
+class TarefaService{
+    public function inserir(){
+        //crate
+    }
+
+    public function recuperar(){
+        //read
+    }
+
+    public function atualizar(){
+        //update
+    }
+
+    public function remover(){
+        //delete
+    }
+}
