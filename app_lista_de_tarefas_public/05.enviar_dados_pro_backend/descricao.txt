@@ -1,0 +1,17 @@
+vamos trabalhar enviando os dados do front pro backend da nossa aplicação
+
+vamos fazê-lo através do formulário contido no script nova_tarefa.php
+
+1. adicionar method="post" action="tarefa_controller.php ao <form> 
+
+2. type="submit" no button e name="tarefa" no input
+
+3. pronto, a tarefa digitada pelo usuário já está sendo enviada pra superglobal $_POST e este é direcionado
+ao script tarefa_controller.php que futuramente fará o controle das funções da aplicação
+
+4. o próximo passo é então esconder esse script tirando-o de htdocs
+para tanto simplesmente criamos um novo tarefa_controller.php dentro do diretório privado app_lista_de_tarefas
+e em seguida copiamos o conteudo pra lá
+
+5. agora vamos apagar a lógica contida no tarefa_controller.php dentro da pasta pública e substitui-la
+pelo require_once, assim um hacker não poderá acessar as regras de negócio. O máximo q ele verá será o require
