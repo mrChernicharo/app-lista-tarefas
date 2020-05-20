@@ -37,7 +37,7 @@
 				inputTarefa.type = 'text'
 				inputTarefa.name = 'tarefa'
 				inputTarefa.className = 'col-9 form-control'
-				inputTarefa.placeholder = txt_tarefa
+				inputTarefa.value = txt_tarefa
 
 				//criar input hidden pra guardar o id da tarefa
 				let inputId = document.createElement('input')
@@ -73,6 +73,10 @@
 
 				//alert(txt_tarefa)
 
+			}
+
+			function remover(id){
+				location.href = 'todas_tarefas.php?acao=remover&id=' + id
 			}
 
 		</script>
@@ -113,7 +117,7 @@
 										<?= ucfirst($valor->tarefa)  ?> (<?= ucfirst($valor->status)  ?>)
 									</div>
 									<div class="col-sm-3 mt-2 d-flex justify-content-between">
-										<i class="fas fa-trash-alt fa-lg text-danger"></i>
+										<i class="fas fa-trash-alt fa-lg text-danger" onclick="remover(<?= $valor->id ?>)"></i>
 										<i class="fas fa-edit fa-lg text-info" onclick="editar(<?= $valor->id ?>, '<?= $valor->tarefa ?>')"></i>
 										<i class="fas fa-check-square fa-lg text-success"></i>
 									</div>
