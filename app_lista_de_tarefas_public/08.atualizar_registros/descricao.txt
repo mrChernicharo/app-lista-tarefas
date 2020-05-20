@@ -1,0 +1,215 @@
+Dando continuidade, vamos trabalhar sobre a atualização dos registros já contidos na tabela 
+
+1. no frontend, vamos associar a abertura de um input com o clique sobre a imagem
+vamso estão criar um onclick dentro do icone que simboliza a edição de registros (o caderninho azul) 
+e disparar assim a function editar() 
+
+no <body> ....
+
+<i class="fas fa-edit fa-lg text-info" onclick="editar()"></i>
+
+
+e no <head> ...
+
+<script>
+		
+			function editar(){
+
+				let form = document.createElement('form')
+				form.method = 'post'
+				form.action = '#'
+
+				let inputTarefa = document.createElement('input')
+				inputTarefa.type = 'text'
+				inputTarefa.name = 'tarefa'
+				inputTarefa.className = 'form-control'
+
+				let button = document.createElement('button')
+				button.type = 'submit'
+				button.className = 'btn btn-info'
+				button.innerHTML = 'Atualizar'
+
+				form.appendChild(inputTarefa)
+
+				form.appendChild(button)
+
+                console.log(form)
+
+			}
+
+
+</script>
+
+
+Pronto, já estamos criando uma árvore de elemento html cada vez que clicamos sobre o ícone de edição
+
+
+2. Falta agora recuperar esses elementos e coloca-los onde está o texto que descreve a tarefa
+vamos adicionar então um id à div que exibe a tarefa
+
+pra que o id seja diferente em cada tarefa gerada pelo foreach, juntamos o id da tarefa ao fim do texto 
+'tarefa_' com o auxílio de um bloco de impressão php. Assim:
+
+              <div class="col-sm-9" id="tarefa_<?= $valor->id ?>" >
+
+isso gerá ids tarefa_1 , tarefa_2 , tarefa_3 etc...
+
+
+
+3. Depois vamos preparar o disparo da função para que passe junto o parâmentro id
+
+                    onclick="editar(<?= $valor->id ?>)"
+
+em seguida, complementamos nossa função editar() para que receba o id por parâmetro. 
+
+
+4. vamos agora selecionar o elemento: (no caso o elemento 'form')
+
+                let tarefa = document.getElementById('tarefa_'+ id)
+
+...e limpar o texto da div pra inclusão do form
+                tarefa.innerHTML = ''
+
+5. Agora vamos inserir o form na página com insertBefore()
+
+    tarefa.insertBefore(form, tarefa[0])
+
+o insertBefore() é um método nativo da API do DOM que permite a inserção de uma árvore de elementos HTML 
+dentro de um outro elemento já renderizado. Ou seja, vamos fazer esse insert após o carregamento da página
+
+Esse método espera dois parâmetros: 
+1. a árvore de elementos que queremos inserir
+2. onde? 
+Como no caso, tarefa não possui filhos (incluisve nesse ponto até o innerHTML foi removido), então 
+sua referencia pode ser feita assim: tarefa[0]. Isso diz que estamos atuando sobre o primeiro elemento contido
+na variável tarela, isto é, o próprio form
+
+
+6. Pronto já está funcionando!
+vamos agora melhorar a exibição, input e button estão um em cima do outro, vamos posiciona-los na mesma linha
+
+
+para isso vamos usar a classe bootstrap col-9 pro input e col-3 pro button, sem esquecer de 
+acrecentar também a classe 'row' no nosso form
+
+
+7. o input vazio não tá tão legal. vamos usar um placeholder com a informação inserida pra ajudar o 
+usuário na hora de corrigir o texto
+vamos então encaminhar esse texto como segundo parâmetro pra nossa function e pra isso vamos alterar
+nosso <i> mais uma vez, adicionando outra tag de impressão <?= ?>
+
+<i class="fas fa-edit fa-lg text-info" onclick="editar(<?= $valor->id ?>, '<?= $valor->tarefa ?>')"></i>
+
+Obs: o primeiro parâmetro passado é um INT, já o segundo é uma String, logo, precisamos encapsula-la 
+com aspas simples.
+Em seguida adicionamos o parâmetro txt_tarefa pra declaração da função. 
+E passamos esse valor como placeholder do input
+
+
+            function editar(id, txt_tarefa){
+				
+                //criar form de edição
+				let form = document.createElement('form')
+				form.action = '#'
+				form.method = 'post'
+				form.className = 'row'
+
+				//criar input
+				let inputTarefa = document.createElement('input')
+				inputTarefa.type = 'text'
+				inputTarefa.name = 'tarefa'
+				inputTarefa.className = 'col-9 form-control'
+                inputTarefa,placeholder = txt_tarefa
+
+				//criar botão
+				let button = document.createElement('button')
+				button.type = 'submit'
+				button.className = 'col-3 btn btn-info'
+				button.innerHTML = 'Atualizar'
+
+				//incluir o input no form
+				form.appendChild(inputTarefa)
+
+				//incluir button no form
+				form.appendChild(button)
+
+				//console.log(form)
+				//alert(id)
+
+				//selecionar a div tarefa
+				let tarefa = document.getElementById('tarefa_'+ id)
+
+				//limpar o texto da div pra inclusão do form
+				tarefa.innerHTML = ''
+
+				//incluir form na pagina
+				tarefa.insertBefore(form, tarefa[0])
+
+			}
+
+
+8. Falta submeter o id da tarefa de volta pro backend através de um input type: hidden  
+
+	            //criar input hidden pra guardar o id da tarefa
+				let inputId = document.createElement('input')
+				inputId.type = 'hidden'
+				inputId.name = 'id'
+				inputId.value = id   // vai receber um INT coincidente com o valor do id da tarefa atual
+
+vamos então incluir o inputId com appendChild e pronto!
+
+Já temos tudo que precisamos pra persistir essas mudanças no backend
+
+	        
+            
+E assim ficou nossa função editar()            
+            
+            function editar(id, txt_tarefa){
+				//criar form de edição
+				let form = document.createElement('form')
+				form.action = '#'
+				form.method = 'post'
+				form.className = 'row'
+
+				//criar input pra entrada do texto
+				let inputTarefa = document.createElement('input')
+				inputTarefa.type = 'text'
+				inputTarefa.name = 'tarefa'
+				inputTarefa.className = 'col-9 form-control'
+				inputTarefa.placeholder = txt_tarefa
+
+				//criar input hidden pra guardar o id da tarefa
+				let inputId = document.createElement('input')
+				inputId.type = 'hidden'
+				inputId.name = 'id'
+				inputId.value = id
+
+				//criar botão
+				let button = document.createElement('button')
+				button.type = 'submit'
+				button.className = 'col-3 btn btn-info'
+				button.innerHTML = 'Atualizar'
+
+				//incluir o input no form
+				form.appendChild(inputTarefa)
+
+				//incluir button no form
+				form.appendChild(button)
+
+				//incluir inputId no form
+				form.appendChild(inputId)
+				//console.log(form)
+				//alert(id)
+
+				//selecionar a div tarefa
+				let tarefa = document.getElementById('tarefa_'+ id)
+
+				//limpar o texto da div pra inclusão do form
+				tarefa.innerHTML = ''
+
+				//incluir form na pagina
+				tarefa.insertBefore(form, tarefa[0])
+
+				//alert(txt_tarefa)
+
+			}
