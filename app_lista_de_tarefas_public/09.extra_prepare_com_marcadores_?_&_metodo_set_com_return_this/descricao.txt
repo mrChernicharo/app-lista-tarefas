@@ -1,0 +1,84 @@
+    1. O método bindValue() pode associar interrogações '?' ao invés de marcadores com dois pontos ':'
+    como elemento de correspondência com a query
+
+    Assim, o que era...
+    
+    public function atualizar(){
+        $query = 'update tb_tarefas SET tarefa = :tarefa where id = :id'; 
+        $stmt = $this->conexao->prepare($query);
+        $stmt->bindValue(':tarefa', $this->tarefa->__get('tarefa'));
+        $stmt->bindValue(':id', $this->tarefa->__get('id'));
+        return $stmt->execute();
+    }
+
+    Pode ser escrito assim:
+
+    public function atualizar(){
+        $query = 'update tb_tarefas SET tarefa = ? where id = ?'; 
+        $stmt = $this->conexao->prepare($query);
+        $stmt->bindValue(1 , $this->tarefa->__get('tarefa'));
+        $stmt->bindValue(2 , $this->tarefa->__get('id'));
+        return $stmt->execute();
+    }
+
+dessa forma substituimos :tarefa e :id por interrogações na nossa query
+e para acessá-las, como primeiro parâmetro de bindValue(),
+basta indicar qual é a interrogação...a primeira? a segunda? 
+
+Resumindo, no nosso prepare() podemos usar tanto parâmetros nomeados como parâmetros numéricos
+
+
+
+2. Macete pros métodos setters
+
+em tarefa.model.php temos
+
+            class Tarefa {
+            private $id;
+            private $id_status;
+            private $tarefa;
+            private $data_cadastro;
+
+            public function __get($atributo){
+                return $this->$atributo;
+            }
+
+            public function __set($atributo, $valor){
+                $this->$atributo = $valor;
+            }
+        }
+
+e em tarefa_controller.php temos
+
+        $tarefa = new Tarefa();
+        $tarefa->__set('id', $_POST['id']);
+        $tarefa->__set('tarefa', $_POST['tarefa']);
+
+Da forma que está, será necessário criar uma linha de código pra cada atributo que quisermos criar 
+
+
+No entanto, em tarefa.model.php, se a gente retornar $this na função __set() ...
+
+
+
+            class Tarefa {
+                private $id;
+                private $id_status;
+                private $tarefa;
+                private $data_cadastro;
+
+                public function __get($atributo){
+                    return $this->$atributo;
+                }
+
+                public function __set($atributo, $valor){
+                    $this->$atributo = $valor;
+                    return $this;
+                }
+            }
+
+
+em tarefa_controller.php, será possível setar vários métodos de uma vez só 
+
+                $tarefa = new Tarefa();
+                $tarefa->__set('id', $_POST['id'])->__set('tarefa', $_POST['tarefa']);
