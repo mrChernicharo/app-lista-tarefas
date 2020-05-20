@@ -1,0 +1,160 @@
+Dando continuidade, vamos recuperar os dados do BD e apresentar esses dados em nosso app
+
+1. em tarefa_controller.php, caso a $acao seja 'recuperar' vamos intanciar uma nova Tarefa e Conexao para
+instanciar também o obj TarefaService
+em seguida vamos executar o método recuperar()
+
+ else if($acao == 'recuperar'){
+    
+    $tarefa = new Tarefa();
+    $conexao = new Conexao();
+
+    $tarefaService = new TarefaService($conexao, $tarefa);
+    $tarefaService->recuperar();
+
+2. o próximo passo é abrir tarefa.service.php e trabalhar na query de consulta dentro do método recuperar()	
+
+    public function recuperar(){ 
+        $query = 'select id, id_status, tarefa from tb_tarefa';
+        $stmt = $this->conexao->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        
+    }
+
+*obs: como essa function forma queries que não recebem dados inseridos pelo usuário ela está livre do perigo de 
+SQL Injection, portanto não há necessidade do bindValue()
+Por fim, ajustamos o fetch style com PDO::FETCH_OBJ para retornar um array de Objetos e retornamos o 
+contúdo desse statement 
+
+3. Atribuimos então o retorno da função à variável $tarefas lá em tarefa_controller.php
+
+    $tarefas = $tarefaService->recuperar();
+
+dessa forma o retorno do método estará disponível também em todas_tarefas.php afinal o script faz um 
+require de tarefa_controller.php que por sua vez, executa o método recuperar(). nesse ponto, ao debugar
+$tarefas, obteremos um array de objetos contendo todos os registros da tabela tb_tarefas
+
+Array
+(
+    [0] => stdClass Object
+        (
+            [id] => 1
+            [id_status] => 1
+            [tarefa] => pagar condominio
+        )
+
+    [1] => stdClass Object
+        (
+            [id] => 2
+            [id_status] => 1
+            [tarefa] => compras mercado
+        )
+
+    [2] => stdClass Object
+        (
+            [id] => 3
+            [id_status] => 1
+            [tarefa] => fazer barba
+        )
+
+    [3] => stdClass Object
+        (
+            [id] => 4
+            [id_status] => 1
+            [tarefa] => fazer amor
+        )
+
+    [4] => stdClass Object
+        (
+            [id] => 5
+            [id_status] => 1
+            [tarefa] => dar banho no cachorro
+        )
+
+4. vamos agora usar esse array de tarefas dentro de um foreach para percorrer nosso array de tarefas e 
+exibir cada uma gerando dinamicamente um card para cada tarefa
+pra tanto, removemos as divs com preechimento hard-code e substituimos esse valor pelo atributo 
+tarefa de cada objeto do array usando a tag de impressão do php
+o id_status é usado pra preencher os parênteses
+
+				<? foreach($tarefas as $indice => $valor) { ?>
+
+					<div class="row mb-3 d-flex align-items-center tarefa">
+						<div class="col-sm-9"> <?= $valor->tarefa ?> (<?= $valor->id_status ?>) </div>
+						<div class="col-sm-3 mt-2 d-flex justify-content-between">
+							<i class="fas fa-trash-alt fa-lg text-danger"></i>
+							<i class="fas fa-edit fa-lg text-info"></i>
+							<i class="fas fa-check-square fa-lg text-success"></i>
+						</div>
+					</div>
+
+				<? } ?>
+
+pronto! já estamos exibindo dinamicamente o nome de cada tarefa e seu status
+
+
+5. no entando o status apresenta apenas um numero que indica o status da tarefa conforme
+especificado na tabela tb_status, onde 1 = pendente e 2 = realizado	
+como queremos exibir o texto associado ao id_status, vamos melhorar nossa instrução SQL do método
+recuperar() em tarefa.service.php	
+
+agora a query vai ficar assim....
+
+	'select 
+		t.id, s.status, t.tarefa 
+	from 
+		tb_tarefas as t
+	left join tb_status as s on (t.id_status = s.id)';
+
+repare que com essa nova query o status informado recebe o texto extraído da tabela tb_status
+e ao invés de números, obtemos os textos 'pendente' / 'realizado'
+
+	Array
+(
+    [0] => stdClass Object
+        (
+            [id] => 1
+            [status] => pendente
+            [tarefa] => pagar condominio
+        )
+
+    [1] => stdClass Object
+        (
+            [id] => 2
+            [status] => pendente
+            [tarefa] => compras mercado
+        )
+
+    [2] => stdClass Object
+        (
+            [id] => 3
+            [status] => pendente
+            [tarefa] => fazer barba
+        )
+
+    [3] => stdClass Object
+        (
+            [id] => 4
+            [status] => pendente
+            [tarefa] => fazer amor
+        )
+
+    [4] => stdClass Object
+        (
+            [id] => 5
+            [status] => pendente
+            [tarefa] => dar banho no cachorro
+        )
+
+6. pra fazer funcionar é preciso ajustar então o atributo acessado pela query de id_status para status 
+simplesmente ...
+
+(<?= $valor->id_status ?>)
+
+passa a ser...
+
+(<?= $valor->status ?>)
+
+
+* aproveitei pra encaixar uns ucfirst() nessas instruções para Deixar sempre a primeira letra em caixa alta
