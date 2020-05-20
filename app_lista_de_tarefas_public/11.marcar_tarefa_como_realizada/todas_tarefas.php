@@ -51,13 +51,9 @@
 				button.className = 'col-3 btn btn-info'
 				button.innerHTML = 'Atualizar'
 
-				//incluir o input no form
+				//incluir o input, button e hidden input no form
 				form.appendChild(inputTarefa)
-
-				//incluir button no form
 				form.appendChild(button)
-
-				//incluir inputId no form
 				form.appendChild(inputId)
 				//console.log(form)
 				//alert(id)
@@ -78,6 +74,11 @@
 			function remover(id){
 				location.href = 'todas_tarefas.php?acao=remover&id=' + id
 			}
+
+			function marcarRealizada(id){
+				location.href = 'todas_tarefas.php?acao=marcarRealizada&id=' + id
+			}
+
 
 		</script>
 	
@@ -118,8 +119,11 @@
 									</div>
 									<div class="col-sm-3 mt-2 d-flex justify-content-between">
 										<i class="fas fa-trash-alt fa-lg text-danger" onclick="remover(<?= $valor->id ?>)"></i>
+										
+										<? if($valor->status == 'pendente') { ?>
 										<i class="fas fa-edit fa-lg text-info" onclick="editar(<?= $valor->id ?>, '<?= $valor->tarefa ?>')"></i>
-										<i class="fas fa-check-square fa-lg text-success"></i>
+										<i class="fas fa-check-square fa-lg text-success" onclick="marcarRealizada(<?= $valor->id ?>)" ></i> 
+										<? } ?>	
 									</div>
 								</div>
 
