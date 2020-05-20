@@ -1,0 +1,54 @@
+Vamos trabalhar na exibição dos nossos registos...
+
+Simbora fazer o refactoring de tarefa_controller.php para fazer o script ser capaz de desempenhar a 
+função a recuperar()
+
+pra tanto, precisamos antes refatorar ......
+
+1. em nova_tarefa.php fazemos o ajuste na url adicionando o parametro 'acao' via GET (com a interrogação)
+
+<form method="post" action="tarefa_controller.php?acao=inserir">
+
+assim adicionamos o índice acao ao array contido na superglobal $_GET
+
+
+
+2. depois, em tarefa_controller.php, vamos encapsular a instância de Tarefa, Conexao e TarefaService com um if()
+que cheque se o parametro 'acao' existe em $_GET e se ele é igual a 'inserir'
+
+assim...
+
+if (isset($_GET['acao']) && ($_GET['acao']) == 'inserir') {
+$tarefa = new Tarefa();
+$tarefa->__set('tarefa', $_POST['tarefa']);
+
+$conexao = new Conexao();
+
+$tarefaService = new TarefaService($conexao, $tarefa);
+$tarefaService->inserir();
+
+
+
+
+3. abrindo todas_tarefas.php vemos que  as informações estão engessadas (hard-code)
+vamos então criar a variável $acao atribuindo o valor 'recuperar' 
+e o require para que tarefa_controller.php também seja acessado daqui
+
+	$acao = 'recuperar';
+	require "tarefa_controller.php";
+
+lembre que quando adicionamos um novo registro, $_GET recebe o índice inclusao => 1 e agora, também o 
+índice 'acao' com valor 'inserir', esse valor dispara a lógica de inclusao de registros no BD
+
+
+
+
+4. como agora queremos criar uma lógica de consulta, vamos criar um novo teste lógico:
+em tarefa_controller.php para verificar o conteudo do índice 'acao' da superglobal
+
+    $acao = isset($_GET['acao']) ? ($_GET['acao']) : $acao;
+
+se $_GET['acao'] já foi setado (no caso da inclusao de registro) então o valor 'registro' será atribuido 
+à 'acao', e o fluxo seguirá a lógica de insersão 
+
+senão, $acao recebe então o valor 'recuperar' conforme atribuido no início do script todas_tarefas.php     
